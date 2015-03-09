@@ -1,14 +1,24 @@
 var winston = require('winston');
 var EventEmitter = require('events').EventEmitter;
 var _ = require('lodash');
+var Q = require('q');
+
+// Routers
+var InputRouter = require('./routers/input');
+var IntentRouter = require('./routers/intent');
+var OutputRouter = require('./routers/output');
 
 var Donna = module.exports = (function() {
 
-    // Donna.logger = null;
-    //
-    // Donna.intentEmitter = null;
-    //
-    // Donna.options = null;
+    Donna.logger = null;
+
+    Donna.outputEmitter = null;
+
+    Donna.options = null;
+
+    Donna.inputRouter = null;
+    Donna.intentRouter = null;
+    Donna.outputRouter = null;
 
     Donna.prototype.defaultOptions = {
         logger: {
@@ -30,20 +40,22 @@ var Donna = module.exports = (function() {
     }
 
 
-    Donna.prototype.registerPlugin = function(plugin, cb) {
+    Donna.prototype.registerPlugin = function(plugin) {
+        var deferred = Q.defer();
 
         if (typeof plugin === "string") {
             this.logger.debug("Register plugin", plugin);
             require(plugin)(this);
-            cb();
+            deferred.resolve();
         } else if (typeof plugin === "function") {
             plugin(this);
-            cb();
+            deferred.resolve();
         } else {
             var err = new Error("Plugin not supported. Type "+typeof plugin);
             this.logger.error(err);
-            cb(err);
+            deferred.resolve();
         }
+        return deferred.promise;
 
     };
 
@@ -59,36 +71,62 @@ var Donna = module.exports = (function() {
 
     Donna.prototype.init = function() {
         var self = this;
+        var deferred = Q.defer();
+
         this.setupLogger();
         this.logger.info("Initializing Donna");
 
-        var cb = function() {
+        var cb = function(err) {
             self.logger.info("Done initializing Donna");
+            if (err) {
+                deferred.reject(err);
+            } else {
+                deferred.resolve();
+            }
         };
 
-        // Initialize Event Emitters
-        this.intentEmitter = new EventEmitter();
+        // Routers
+        this.inputRouter = new InputRouter(this);
+        this.intentRouter = new IntentRouter(this);
+        this.outputRouter = new OutputRouter(this);
 
         // Register plugins
         var plugins = require('./plugins')(this, cb);
 
+        return deferred.promise;
     };
 
-    Donna.prototype.registerIntentHandler = function(intent, handler) {
-        this.intentEmitter.on(intent, handler);
-    };
-
-    Donna.prototype.intent = Donna.prototype.registerIntentHandler;
-
-    Donna.prototype.handleIntent = function(intent, context) {
-        this.intentEmitter.emit(intent, context);
+    Donna.prototype.registerIntent = function(intent, handler) {
+        var deferred = Q.defer();
+        this.intentRouter.register(intent, handler, function(err) {
+            if (err) {
+                deferred.reject(err);
+            } else {
+                deferred.resolve();
+            }
+        });
+        return deferred.promise;
     };
 
     // Sense plugin emits events that are handled by the Brain
+    Donna.prototype.registerSense = function(sense) {
+        var senseInst = sense(this);
+        this.senses.push(senseInst);
+
+        return this;
+    }
 
     // Input to Intent
+    Donna.prototype.inputToIntent = function(input) {
+        var deferred = Q.defer();
+
+        return deferred.promise;
+    };
 
     // Intent router
+    Donna.prototype.intent = function(intent, context) {
+        return this.intentRouter.process(intent, context);
+    };
 
     // Process Intent in Brain with plugins
 

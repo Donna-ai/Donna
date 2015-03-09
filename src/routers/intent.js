@@ -21,13 +21,19 @@ var IntentRouter = module.exports = (function() {
 
     IntentRouter.prototype.process = function(intent, context) {
         var deferred = Q.defer();
-        this.intentEmitter.emit(intent, this, context, function(err) {
-            if (err) {
-                deferred.reject(err);
-            } else {
-                deferred.resolve();
-            }
-        });
+        var handlers = this.emitter.listeners(intent);
+        if (handlers.length > 0) {
+            this.emitter.emit(intent, this, context, function(err) {
+                if (err) {
+                    deferred.reject(err);
+                } else {
+                    deferred.resolve();
+                }
+            });
+        } else {
+            var err = new Error("No intent handler for '"+intent+"'");
+            deferred.reject(err);
+        }
         return deferred.promise;
     };
 
