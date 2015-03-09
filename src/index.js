@@ -7,6 +7,11 @@ var Q = require('q');
 var InputRouter = require('./routers/input');
 var IntentRouter = require('./routers/intent');
 var OutputRouter = require('./routers/output');
+// Config
+var Config = require('./config');
+// Entities
+var InputEntity = require('./entities/input');
+var IntentEntity = require('./entities/intent');
 
 var Donna = module.exports = (function() {
 
@@ -19,6 +24,33 @@ var Donna = module.exports = (function() {
     Donna.inputRouter = null;
     Donna.intentRouter = null;
     Donna.outputRouter = null;
+
+    Donna.config = null;
+
+    Donna.InputEntity = InputEntity;
+    Donna.IntentEntity = IntentEntity;
+
+    // http://stackoverflow.com/a/1608546/2578205
+    Donna.prototype.createInputEntity = (function() {
+        function F(args) {
+            return InputEntity.apply(this, args);
+        }
+        F.prototype = InputEntity.prototype;
+        return function() {
+            return new F(arguments);
+        }
+    })();
+    Donna.createInputEntity = Donna.prototype.createInputEntity;
+    Donna.prototype.createIntentEntity = (function() {
+        function F(args) {
+            return IntentEntity.apply(this, args);
+        }
+        F.prototype = IntentEntity.prototype;
+        return function() {
+            return new F(arguments);
+        }
+    })();
+    Donna.createIntentEntity = Donna.prototype.createIntentEntity;
 
     Donna.prototype.defaultOptions = {
         logger: {
@@ -33,12 +65,12 @@ var Donna = module.exports = (function() {
 
         // Merge options and defaults
         options = typeof options === "undefined" ? {} : options;
-        this.options = _.cloneDeep(Donna.prototype.defaultOptions);
-        _.merge(this.options, options);
+        this.config = new Config();
+        _.merge(this.config, _.cloneDeep(Donna.prototype.defaultOptions));
+        _.merge(this.config, options);
 
         return this;
     }
-
 
     Donna.prototype.registerPlugin = function(plugin) {
         var deferred = Q.defer();
@@ -61,7 +93,7 @@ var Donna = module.exports = (function() {
 
     Donna.prototype.setupLogger = function() {
         // Setup Logger
-        var options = this.options.logger;
+        var options = this.config.logger;
         var logger = new(winston.Logger);
         logger.add(winston.transports.Console, options);
         // Attach logger to Donna
@@ -108,7 +140,7 @@ var Donna = module.exports = (function() {
         return deferred.promise;
     };
 
-    // Sense plugin emits events that are handled by the Brain
+    // TODO: Sense plugin emits events that are handled by the Brain
     Donna.prototype.registerSense = function(sense) {
         var senseInst = sense(this);
         this.senses.push(senseInst);
@@ -116,16 +148,23 @@ var Donna = module.exports = (function() {
         return this;
     }
 
-    // Input to Intent
-    Donna.prototype.inputToIntent = function(input) {
-        var deferred = Q.defer();
+    /**
+    Intent Extractors take in an InputEntity and
+    will propogate any IntentEntity results from that to Donna.
+    */
+    Donna.prototype.registerIntentExtractor = function(meta, handler) {
+        return this.inputRouter.register(meta, handler);
+    };
 
-        return deferred.promise;
+    // Input to Intent
+    Donna.prototype.input = function(inputEntity) {
+        return this.inputRouter.process(inputEntity);
     };
 
     // Intent router
-    Donna.prototype.intent = function(intent, context) {
-        return this.intentRouter.process(intent, context);
+    Donna.prototype.intent = function(intentEntity) {
+        this.logger.debug('received intente!!!!');
+        return this.intentRouter.process(intentEntity);
     };
 
     // Process Intent in Brain with plugins

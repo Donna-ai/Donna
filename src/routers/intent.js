@@ -4,13 +4,18 @@ var Q = require('q');
 
 var IntentRouter = module.exports = (function() {
 
+    IntentRouter.donna = null;
     IntentRouter.emitter = null;
+    IntentRouter.IntentEntity = null;
 
     function IntentRouter(donna) {
-        donna.logger.info("IntentRouter constructor");
+        this.donna = donna;
+        donna.logger.verbose("IntentRouter constructor");
 
         // Initialize Event Emitter
         this.emitter = new EventEmitter();
+
+        this.IntentEntity = donna.constructor.IntentEntity;
 
     }
 
@@ -19,20 +24,47 @@ var IntentRouter = module.exports = (function() {
         cb();
     };
 
-    IntentRouter.prototype.process = function(intent, context) {
+    IntentRouter.prototype.process = function(intentEntity) {
         var deferred = Q.defer();
-        var handlers = this.emitter.listeners(intent);
-        if (handlers.length > 0) {
-            this.emitter.emit(intent, this, context, function(err) {
-                if (err) {
-                    deferred.reject(err);
+
+        try {
+            this.donna.logger.verbose("IntentRouter::process :",
+                intentEntity);
+
+            // Check if intentEntity is instance of IntentEntity
+            if (intentEntity instanceof this.IntentEntity) {
+
+                this.donna.logger.debug(
+                    "Is instance of IntentEntity");
+
+                // Is instance of IntentEntity
+                var intent = intentEntity.getIntent();
+
+                this.donna.logger.debug("Intent:", intent);
+
+                var handlers = this.emitter.listeners(intent);
+                if (handlers.length > 0) {
+                    this.emitter.emit(intent, this.donna, intentEntity,
+                        function(err) {
+                            if (err) {
+                                deferred.reject(err);
+                            } else {
+                                deferred.resolve();
+                            }
+                        });
                 } else {
-                    deferred.resolve();
+                    var err = new Error("No intent handler for '" +
+                        intent + "'");
+                    deferred.reject(err);
                 }
-            });
-        } else {
-            var err = new Error("No intent handler for '"+intent+"'");
-            deferred.reject(err);
+            } else {
+                var err = new Error(
+                    "Must be instance of IntentEnity.");
+                this.donna.logger.error(err);
+                deferred.reject(err);
+            }
+        } catch (error) {
+            deferred.reject(error);
         }
         return deferred.promise;
     };
