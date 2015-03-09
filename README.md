@@ -1,4 +1,4 @@
-# Donna
+# Donna [![Build Status](https://travis-ci.org/Donna-ai/Donna.svg?branch=master)](https://travis-ci.org/Donna-ai/Donna)
 > Donna, the best Virtual Secretary platform
 
 ---
