@@ -8,12 +8,6 @@ var InputEntity = module.exports = (function() {
     InputEntity.prototype.data = null;
 
     // Context
-    /*
-    InputEntity.prototype.state = null;
-    InputEntity.prototype.referenceTime = null;
-    InputEntity.prototype.timezone = null;
-    InputEntity.prototype.entities = null;
-    */
     InputEntity.prototype.context = null;
 
     function InputEntity(params) {
@@ -67,22 +61,8 @@ var InputEntity = module.exports = (function() {
         ]
     }
     */
-    // InputEntity.prototype.setContext = function(context) {
-    //     // state = context.state || this.state;
-    //     // referenceTime = context.referenceTime || this.referenceTime;
-    //     // timezone = context.timezone || this.timezone;
-    //     // entities = context.entities || this.entities;
-    //     // return this.getContext();
-    //     return this.context = context;
-    // };
     InputEntity.prototype.getContext = function() {
-        // return {
-        //     state: this.state,
-        //     referenceTime: this.referenceTime,
-        //     timezone: this.timezone,
-        //     entities: this.entities
-        // };
-        return context;
+        return this.context;
     };
 
     return InputEntity;

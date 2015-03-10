@@ -12,12 +12,11 @@ var Config = require('./config');
 // Entities
 var InputEntity = require('./entities/input');
 var IntentEntity = require('./entities/intent');
+var OutputEntity = require('./entities/output');
 
 var Donna = module.exports = (function() {
 
     Donna.logger = null;
-
-    Donna.outputEmitter = null;
 
     Donna.options = null;
 
@@ -27,10 +26,12 @@ var Donna = module.exports = (function() {
 
     Donna.config = null;
 
-    Donna.InputEntity = InputEntity;
-    Donna.IntentEntity = IntentEntity;
+    /**
+    InputEntity
 
-    // http://stackoverflow.com/a/1608546/2578205
+    Helpful link: http://stackoverflow.com/a/1608546/2578205
+    */
+    Donna.InputEntity = InputEntity;
     Donna.prototype.createInputEntity = (function() {
         function F(args) {
             return InputEntity.apply(this, args);
@@ -41,6 +42,11 @@ var Donna = module.exports = (function() {
         }
     })();
     Donna.createInputEntity = Donna.prototype.createInputEntity;
+
+    /**
+    IntentEntity
+    */
+    Donna.IntentEntity = IntentEntity;
     Donna.prototype.createIntentEntity = (function() {
         function F(args) {
             return IntentEntity.apply(this, args);
@@ -51,6 +57,21 @@ var Donna = module.exports = (function() {
         }
     })();
     Donna.createIntentEntity = Donna.prototype.createIntentEntity;
+
+    /**
+    OutputEntity
+    */
+    Donna.OutputEntity = OutputEntity;
+    Donna.prototype.createOutputEntity = (function() {
+        function F(args) {
+            return OutputEntity.apply(this, args);
+        }
+        F.prototype = OutputEntity.prototype;
+        return function() {
+            return new F(arguments);
+        }
+    })();
+    Donna.createOutputEntity = Donna.prototype.createOutputEntity;
 
     Donna.prototype.defaultOptions = {
         logger: {
