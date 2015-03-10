@@ -1,4 +1,4 @@
-var Donna = require('../src/');
+var Donna = require('../../src/');
 
 var assert = require("assert");
 
@@ -11,10 +11,9 @@ describe('Wit.ai Plugin', function() {
             // Init Donna
             var donna = new Donna({
                 logger: {
-                    level: 'error'
+                    // level: 'error'
                 }
             });
-            donna.init();
             // Store Donna
             this.donna = donna;
 

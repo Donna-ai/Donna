@@ -4,9 +4,9 @@ var Q = require('q');
 
 var IntentRouter = module.exports = (function() {
 
-    IntentRouter.donna = null;
-    IntentRouter.emitter = null;
-    IntentRouter.IntentEntity = null;
+    IntentRouter.prototype.donna = null;
+    IntentRouter.prototype.emitter = null;
+    IntentRouter.prototype.IntentEntity = null;
 
     function IntentRouter(donna) {
         this.donna = donna;

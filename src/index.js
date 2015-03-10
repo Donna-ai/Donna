@@ -65,9 +65,11 @@ var Donna = module.exports = (function() {
 
         // Merge options and defaults
         options = typeof options === "undefined" ? {} : options;
-        this.config = new Config();
-        _.merge(this.config, _.cloneDeep(Donna.prototype.defaultOptions));
+        this.config = _.cloneDeep(Donna.prototype.defaultOptions);
+        _.merge(this.config, new Config());
         _.merge(this.config, options);
+
+        this.init();
 
         return this;
     }

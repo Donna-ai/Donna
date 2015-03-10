@@ -4,9 +4,9 @@ var Q = require('q');
 
 var InputRouter = module.exports = (function() {
 
-    InputRouter.donna = null;
-    InputRouter.dataTypesEmitter = null;
-    InputRouter.InputEntity = null;
+    InputRouter.prototype.donna = null;
+    InputRouter.prototype.dataTypesEmitter = null;
+    InputRouter.prototype.InputEntity = null;
 
     function InputRouter(donna) {
         this.donna = donna;

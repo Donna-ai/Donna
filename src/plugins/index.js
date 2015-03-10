@@ -5,15 +5,11 @@ module.exports = function(donna, cb) {
     donna.logger.info("Loading Built-in Plugins");
 
     // List of all plugins
-    var plugins = [
-        "wit-ai",
-        "sms"
-    ];
+    var plugins = donna.config.plugins || [];
 
     // Iterate thru all built-in plugins
-    async.each(plugins, function(pluginName, callback) {
+    async.each(plugins, function(pluginPath, callback) {
         // Load current plugin
-        var pluginPath = "./plugins/"+pluginName;
         donna.registerPlugin(pluginPath, callback);
     }, function(err){
         if( err ) {

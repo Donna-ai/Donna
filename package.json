@@ -5,7 +5,7 @@
   "main": "src/index.js",
   "scripts": {
     "start": "node bin/donna.js",
-    "test": "./node_modules/mocha/bin/mocha --reporter spec"
+    "test": "./node_modules/mocha/bin/mocha --reporter spec --recursive"
   },
   "repository": {
     "type": "git",
