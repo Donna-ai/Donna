@@ -1,4 +1,6 @@
 # Donna [![Build Status](https://travis-ci.org/Donna-ai/Donna.svg?branch=master)](https://travis-ci.org/Donna-ai/Donna)
+
+[![Join the chat at https://gitter.im/Donna-ai/Donna](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/Donna-ai/Donna?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 > Donna, the best Virtual Secretary platform
 
 ---
