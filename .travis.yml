@@ -5,4 +5,12 @@ node_js:
   - "0.10"
   - "iojs"
   - "iojs-v1.0.4"
-  
+
+notifications:
+  webhooks:
+    urls:
+      - https://webhooks.gitter.im/e/a2d574f3fdda1ebfda73
+    on_success: change  # options: [always|never|change] default: always
+    on_failure: always  # options: [always|never|change] default: always
+    on_start: true     # default: false
+    
