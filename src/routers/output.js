@@ -5,7 +5,7 @@ var Q = require('q');
 var OutputRouter = module.exports = (function() {
 
     OutputRouter.prototype.donna = null;
-    OutputRouter.prototype.dataTypesEmitter = null;
+    OutputRouter.prototype.emitter = null;
     OutputRouter.prototype.OutputEntity = null;
 
     function OutputRouter(donna) {
@@ -13,7 +13,7 @@ var OutputRouter = module.exports = (function() {
         donna.logger.info("OutputRouter constructor");
 
         // Initialize Event Emitters
-        this.dataTypesEmitter = new EventEmitter();
+        this.emitter = new EventEmitter();
 
         this.OutputEntity = donna.constructor.OutputEntity;
 
@@ -21,15 +21,18 @@ var OutputRouter = module.exports = (function() {
 
     OutputRouter.prototype.register = function(meta, handler) {
         var deferred = Q.defer();
+        var donna = this.donna;
 
-        this.donna.logger.debug('OutputRouter::register', meta);
+        donna.logger.debug('OutputRouter::register', meta);
 
         // Check for required fields
         if (meta.name && meta.description && meta.dataTypes) {
-            this.donna.logger.debug('Intent Extractor passes validation');
+            donna.logger.debug('Intent Extractor passes validation');
         } else {
-            deferred.reject(new Error("Missing required field"));
-            return;
+            var err = new Error("Missing required field");
+            donna.logger.error(err);
+            deferred.reject(err);
+            return deferred.promise;
         }
 
         // Bind to all data types
@@ -38,7 +41,9 @@ var OutputRouter = module.exports = (function() {
         if (len > 0) {
             for (var d = 0; d < len; d++) {
                 var dt = dataTypes[d];
-                this.dataTypesEmitter.on(dt, handler);
+                var eventName = "data-type::"+dt;
+                donna.logger.debug('Output handler bind to event name:', eventName);
+                this.emitter.on(eventName, handler);
             }
             deferred.resolve();
         } else {
@@ -49,27 +54,31 @@ var OutputRouter = module.exports = (function() {
         return deferred.promise;
     };
 
-    OutputRouter.prototype.process = function(input, context) {
+    OutputRouter.prototype.process = function(outputEntity, context) {
         var deferred = Q.defer();
         var donna = this.donna;
 
         try {
             donna.logger.verbose("OutputRouter::process :",
-                input);
+                outputEntity);
 
-            // Check if input is instance of OutputEntity
-            if (input instanceof this.OutputEntity) {
+            // Check if outputEntity is instance of OutputEntity
+            if (outputEntity instanceof this.OutputEntity) {
 
                 donna.logger.debug(
                     "Is instance of OutputEntity");
 
-                // Bind to all data types
-                var dataTypes = input.getDataTypes() || [];
+                // Send to all data types
+                var dataTypes = outputEntity.getDataTypes() || [];
                 var len = dataTypes.length;
                 if (len > 0) {
                     for (var d = 0; d < len; d++) {
                         var dt = dataTypes[d];
-                        this.dataTypesEmitter.emit(dt, this.donna, input,
+                        var eventName = "data-type::"+dt;
+                        donna.logger.debug('Output to event name:', eventName);
+                        donna.logger.debug('# of Listeners:', this.emitter.listeners().length);
+
+                        this.emitter.emit(eventName, this.donna, outputEntity,
                             function() {
                             // TODO: handle this callback
                             donna.logger.debug(arguments);

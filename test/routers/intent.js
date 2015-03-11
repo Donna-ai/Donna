@@ -9,7 +9,7 @@ describe('Intent Router', function() {
         // Init Donna
         var donna = new Donna({
             logger: {
-                // level: 'error'
+                // level: 'debug'
             }
         });
         // Store Donna
@@ -68,6 +68,7 @@ describe('Intent Router', function() {
 
                             cb();
 
+                            done();
                         });
                 };
 
@@ -101,7 +102,6 @@ describe('Intent Router', function() {
                                     'intent.then'
                                 );
                                 assert(true);
-                                done()
                             })
                             .catch(function(err) {
                                 done(err);

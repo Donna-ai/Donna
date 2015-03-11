@@ -190,9 +190,14 @@ var Donna = module.exports = (function() {
         return this.intentRouter.process(intentEntity);
     };
 
-    // Process Intent in Brain with plugins
-
     // Output router
+    Donna.prototype.registerOutput = function(meta, handler) {
+        return this.outputRouter.register(meta, handler);
+    };
+    Donna.prototype.output = function(outputEntity) {
+        return this.outputRouter.process(outputEntity);
+    };
+
 
     // Output to Output plugin
 

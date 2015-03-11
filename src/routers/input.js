@@ -29,7 +29,7 @@ var InputRouter = module.exports = (function() {
             this.donna.logger.debug('Intent Extractor passes validation');
         } else {
             deferred.reject(new Error("Missing required field"));
-            return;
+            return deferred.promise;
         }
 
         // Bind to all data types
@@ -49,7 +49,7 @@ var InputRouter = module.exports = (function() {
         return deferred.promise;
     };
 
-    InputRouter.prototype.process = function(input, context) {
+    InputRouter.prototype.process = function(input) {
         var deferred = Q.defer();
         var donna = this.donna;
 
