@@ -1,3 +1,3 @@
 # Documentation
 
-- [Anatomy](anatomy.md)
+- [Anatomy](anatomy/)
