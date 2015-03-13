@@ -3,6 +3,9 @@
   "version": "0.1.0",
   "description": "Donna, the best Virtual Secretary platform",
   "main": "src/index.js",
+  "bin": {
+      "donna-ai": "bin/donna.js"
+  },
   "scripts": {
     "start": "node bin/donna.js",
     "test": "./node_modules/mocha/bin/mocha --reporter spec --recursive"
