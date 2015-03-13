@@ -23,3 +23,12 @@ Outputs can be anything from Physical motion
 (think robot with arms / legs / etc)
 or sending a SMS message (texting) or even output this YouTube video to
 the Chromecast on the TV.
+
+The Controls expect a certain format, too. And the Cortex is responsible for any Encoding and Retrieving before transmitting in that valid format.
+
+## Flow of Information
+
+Sense receives stimulus and sends that input to the Brain as a Thought.
+The Brain is comprised of many Cortices that process Thoughts.
+Cortices have the ability to process a Thought and
+consequentially output a response through Controls, and influence the world.
