@@ -25,6 +25,8 @@ describe('Wit.ai Plugin', function() {
 
                 var donna = this.donna;
 
+                this.timeout(5*1000); // Increase timeout for slow networks
+
                 // Create InputEntity instance
                 var input = donna.createInputEntity({
                     senseTypes: [],
