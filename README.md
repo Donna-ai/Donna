@@ -28,7 +28,8 @@ For more technical information see [the documentation](docs/).
 
 ### Documentation
 
-See [`docs/` directory](docs/).
+See [`docs/` directory](docs/) for list of documentation pages.
+A good place to start is [archtecture.md](docs/anatomy/architecture.md).
 
 ### Goals and Roadmap
 
